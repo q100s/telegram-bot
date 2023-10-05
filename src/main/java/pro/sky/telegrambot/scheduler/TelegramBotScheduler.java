@@ -16,18 +16,21 @@ import java.util.List;
 public class TelegramBotScheduler {
 
     @Autowired
-    private TelegramBot telegramBot;
+    private final TelegramBot telegramBot;
     @Autowired
-    private NotificationTaskRepository repository;
+    private final NotificationTaskRepository repository;
+
+    public TelegramBotScheduler(TelegramBot telegramBot, NotificationTaskRepository repository) {
+        this.telegramBot = telegramBot;
+        this.repository = repository;
+    }
 
     @Scheduled(cron = "0 0/1 * * * *")
     public void sendTasksByCurrentMinute() {
         LocalDateTime currentMinute = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
         List<NotificationTask> notificationTasks = repository.findByNotificationTime(currentMinute);
         notificationTasks.forEach(notificationTask -> {
-            if (notificationTask.getNotificationTime().equals(currentMinute)) {
-                telegramBot.execute(new SendMessage(notificationTask.getChatId(), notificationTask.toString()));
-            }
+            telegramBot.execute(new SendMessage(notificationTask.getChatId(), notificationTask.toString()));
         });
     }
 }
