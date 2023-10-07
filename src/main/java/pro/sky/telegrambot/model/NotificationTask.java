@@ -1,13 +1,11 @@
 package pro.sky.telegrambot.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
+@Table(name = "notification_task")
 public class NotificationTask {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -63,7 +61,8 @@ public class NotificationTask {
         if (o == null || getClass() != o.getClass()) return false;
         NotificationTask that = (NotificationTask) o;
         return Objects.equals(id, that.id) && Objects.equals(chatId, that.chatId) &&
-                Objects.equals(notificationText, that.notificationText) && Objects.equals(notificationTime, that.notificationTime);
+                Objects.equals(notificationText, that.notificationText)
+                && Objects.equals(notificationTime, that.notificationTime);
     }
 
     @Override

@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 
 @Service
 public class TelegramBotUpdatesListener implements UpdatesListener {
-    private final Pattern pattern = Pattern.compile("([0-9\\.\\:\\s]{16})(\\s)([\\W+]+)");
+    private final Pattern PATTERN = Pattern.compile("([0-9\\.\\:\\s]{16})(\\s)([\\W+]+)");
 
     private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
     private final NotificationTaskRepository repository;
@@ -43,12 +43,12 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         updates.forEach(update -> {
             Message message = update.message();
             logger.info("Processing update: {}", update);
-            if (message.text() != null && message.text().equals("/start")) {
+            if ("/start".equalsIgnoreCase(message.text())) {
                 telegramBot.execute(new SendMessage(update.message().chat().id(), "Hello!"));
             } else {
-                String notification = message.text();
+                String text = message.text();
                 Long chatId = message.chat().id();
-                Matcher matcher = pattern.matcher(notification);
+                Matcher matcher = PATTERN.matcher(text);
                 if (matcher.matches()) {
                     try {
                         String date = matcher.group(1);

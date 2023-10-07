@@ -8,7 +8,6 @@ import pro.sky.telegrambot.model.NotificationTask;
 import pro.sky.telegrambot.repository.NotificationTaskRepository;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -22,12 +21,12 @@ public class TelegramBotScheduler {
         this.repository = repository;
     }
 
-    @Scheduled(cron = "0 0/1 * * * *")
+    @Scheduled(fixedDelay = 5_000L)
     public void sendTasksByCurrentMinute() {
-        LocalDateTime currentMinute = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-        List<NotificationTask> notificationTasks = repository.findByNotificationTime(currentMinute);
+        LocalDateTime currentMinute = LocalDateTime.now();
+        List<NotificationTask> notificationTasks = repository.findAllByNotificationTimeLessThan(currentMinute);
         notificationTasks.forEach(notificationTask -> {
-            telegramBot.execute(new SendMessage(notificationTask.getChatId(), notificationTask.toString()));
+            telegramBot.execute(new SendMessage(notificationTask.getChatId(), notificationTask.getNotificationText()));
         });
     }
 }
